@@ -15,12 +15,23 @@ class Node
         $this->next = $next;
     }
 
-    public function getElement(): mixed {}
+    public function getElement(): mixed
+    {
+        return $this->element;
+    }
 
-    public function setElement(mixed $element): void {}
+    public function setElement(mixed $element): void
+    {
+        $this->element = $element;
+    }
 
-    public function getNext(): ?Node {}
+    public function getNext(): ?Node
+    {
+        return $this->next;
+    }
 
-    public function setNext(?Node $next): void {}
-
+    public function setNext(?Node $next): void
+    {
+        $this->next = $next;
+    }
 }
