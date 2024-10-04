@@ -24,16 +24,23 @@ class LinkedList implements ListInterface
 
     public function push(mixed $element): void
     {
-        if ($this->head->getElement() === null) {
+        $currentNode = $this->head;
+
+        if ($currentNode->getElement() === null) {
             $this->head->setElement($element);
             $this->size++;
             return;
         } else {
-            $currentNode = $this->head;
+            if (gettype($currentNode->getElement()) !== gettype($element)) {
+                throw new \InvalidArgumentException("Error: element type mismatch");
+            }
+
             while ($currentNode->getNext() !== null) {
                 $currentNode = $currentNode->getNext();
             }
-            $currentNode->setNext(new Node($element));
+
+            $newNode = new Node($element);
+            $currentNode->setNext($newNode);
             $this->size++;
         }
     }
@@ -43,45 +50,85 @@ class LinkedList implements ListInterface
         $currentNode = $this->head;
         $currentIndex = 0;
 
-        while ($currentNode !== null) {
-            if ($currentIndex === $index) {
-                return $currentNode->getElement();
-            } else {
-                $currentNode = $currentNode->getNext();
-                $currentIndex++;
-                $this->size++;
-            }
+        if ($index < 0 || $index >= $this->size) {
+            throw new \OutOfRangeException("Index out of bounds");
         }
+
+        while ($currentIndex !== $index) {
+            $currentNode = $currentNode->getNext();
+            $currentIndex++;
+        }
+        return $currentNode->getElement();
     }
 
     public function set(int $index, mixed $element): void {}
 
-    public function clear(): void {}
+    public function clear(): void
+    {
+        $this->head = new Node(null);
+        $this->size = 0;
+    }
 
-    public function includes(mixed $element): bool {}
+    public function includes(mixed $element): bool
+    {
+        $currentNode = $this->head;
 
-    public function isEmpty(): bool {}
+        while ($currentNode->getNext() !== null) {
+            if ($currentNode->getElement() === $element) {
+                return true;
+            }
+            $currentNode = $currentNode->getNext();
+            $this->size++;
+        }
+        return false;
+    }
 
-    public function indexOf(mixed $element): int {}
+    public function isEmpty(): bool
+    {
+        if ($this->size === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function indexOf(mixed $element): int
+    {
+        $currentNode = $this->head;
+        $currentIndex = 0;
+
+        while ($currentNode->getNext() !== null) {
+            if ($currentNode->getElement() === $element) {
+                return  $currentIndex;
+            }
+            $currentNode = $currentNode->getNext();
+            $currentIndex++;
+        }
+        throw new \OutOfBoundsException("Element $element not found");
+    }
 
     public function remove(int $index): void
     {
         $currentNode = $this->head;
         $currentIndex = 0;
 
-        while ($currentNode !== null) {
-            if ($currentIndex === $index - 1) {
-                $previousNode = $currentNode;
-                $toDeleteNode = $currentNode->getNext();
-                $nextNode = $toDeleteNode->getNext();
 
-                $previousNode->setNext($nextNode);
-            } else {
+        if ($index < 0 || $index >= $this->size) {
+            throw new \OutOfRangeException("Index out of bounds");
+        }
+
+        if ($index === 0) {
+            $currentNode = $currentNode->getNext();
+        } else {
+            while ($currentIndex < $index) {
+                $previousNode = $currentNode;
                 $currentNode = $currentNode->getNext();
                 $currentIndex++;
-                $this->size++;
             }
+
+            $previousNode->setNext($currentNode->getNext());
         }
+
+        $this->size--;
     }
 
     public function size(): int
@@ -89,5 +136,18 @@ class LinkedList implements ListInterface
         return $this->size;
     }
 
-    public function toArray(): array {}
+    public function toArray(): array
+    {
+        $newArray = [];
+
+        $currentNode = $this->head;
+        $currentIndex = 0;
+
+        while ($currentNode !== null) {
+            $newArray[] = $currentNode->getElement();
+            $currentNode = $currentNode->getNext();
+            $currentIndex++;
+        }
+        return $newArray;
+    }
 }
